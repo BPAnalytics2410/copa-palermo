@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual de uso · Copa Palermo</title>
+<link rel="icon" href="assets/logo.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b12;--panel:#0f1724;--panel2:#162133;--line:#243049;--acc:#2fbdf0;--gold:#f2c230;--txt:#e9f0fa;--muted:#8ea0ba}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.6 Inter,system-ui,sans-serif}
+a{color:var(--acc)}
+h1,h2,h3{font-family:'Barlow Condensed',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.03em;line-height:1.1;margin:0}
+header{background:#05080d;border-bottom:3px solid var(--acc);padding:18px 16px}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+header .wrap{display:flex;align-items:center;gap:16px;padding:0}
+header img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--acc)}
+header h1{font-size:34px}
+header h1 em{font-style:normal;color:var(--gold)}
+header p{margin:2px 0 0;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;font-size:13px}
+main{padding-bottom:70px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:18px}
+section h2{font-size:24px;color:var(--gold);margin-bottom:10px}
+section h3{font-size:18px;color:var(--acc);margin:16px 0 4px}
+ol,ul{padding-left:22px;margin:6px 0}
+li{margin:4px 0}
+code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
+.tip,.warn{border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14px}
+.tip{background:rgba(47,189,240,.1);border:1px solid rgba(47,189,240,.4)}
+.warn{background:rgba(242,194,48,.1);border:1px solid rgba(242,194,48,.45)}
+.links{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.links a{display:block;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--txt)}
+.links a b{display:block;color:var(--acc);font-family:'Barlow Condensed',sans-serif;font-size:18px;text-transform:uppercase}
+.links a span{color:var(--muted);font-size:13px}
+img.afiche{width:100%;max-width:520px;border-radius:12px;border:1px solid var(--line);display:block;margin:10px auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em}
+.btn{display:inline-block;background:var(--acc);color:#031622;font-weight:700;border-radius:9px;padding:8px 14px;text-decoration:none;border:0;cursor:pointer;font:inherit;font-weight:700}
+@media print{body{background:#fff;color:#000}section{border-color:#bbb;background:#fff}header{background:#fff}.noprint{display:none}h2,h3,a{color:#000}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <img src="assets/logo.jpg" alt="Copa Palermo">
+    <div>
+      <h1>Manual de uso · Copa <em>Palermo</em></h1>
+      <p>Cómo llevar el campeonato paso a paso</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section>
+  <h2>1. Qué es y cómo funciona</h2>
+  <p>La página del campeonato <b>lee un Google Sheet</b> y calcula todo sola: tabla de posiciones, goleadores, tarjetas, calendario, fases finales y pagos. <b>Nunca se escribe una tabla de posiciones a mano.</b> Vos solo cargás datos: partidos, marcadores, goleadores, tarjetas y pagos.</p>
+  <p>Hay dos formas de cargar: <b>desde la página</b> (botón <code>💾 Guardar en el Sheet</code>) o <b>directo en el Google Sheet</b>. Las dos funcionan y se ven igual.</p>
+  <div class="links" style="margin-top:12px">
+    <a href="./"><b>La página</b><span>Posiciones, calendario y todo lo demás</span></a>
+    <a href="https://docs.google.com/spreadsheets/d/1MiHemcU2rmKQhyEkXJqwqwxHvhc_yDXLjg8NVHcO07g/edit" target="_blank" rel="noopener"><b>El Google Sheet</b><span>Los datos del campeonato</span></a>
+    <a href="descargas/COPA%20PALERMO%20-%20BASE%20DE%20DATOS%20(plantilla).xlsx" download><b>Plantilla Excel</b><span>Descargar la base vacía (respaldo)</span></a>
+  </div>
+  <img class="afiche" src="assets/afiche.jpg" alt="Afiche de la Copa Palermo">
+</section>
+
+<section>
+  <h2>2. El campeonato</h2>
+  <table>
+    <tr><th>Dato</th><th>Valor</th></tr>
+    <tr><td>Categoría</td><td>Varones (sin mundialitos 2022 al 2026)</td></tr>
+    <tr><td>Grupos</td><td>Grupo A y Grupo B, 8 equipos cada uno</td></tr>
+    <tr><td>Inscripción</td><td>$100 por equipo</td></tr>
+    <tr><td>Puntos</td><td>Victoria 3 · empate 1 · derrota 0</td></tr>
+    <tr><td>Clasifican</td><td>Los 4 primeros de cada grupo (cuartos de final)</td></tr>
+    <tr><td>Suspensión</td><td>3 amarillas acumuladas · roja = 1 fecha</td></tr>
+    <tr><td>Premios</td><td>Campeón $800 · Vicecampeón $400 · Tercero $200 · Cuarto $100</td></tr>
+    <tr><td>Sede</td><td>Complejo Deportivo Velez Auto (Monay Baguanchi)</td></tr>
+    <tr><td>Contacto</td><td>Anthony Loor · 096 329 7178</td></tr>
+  </table>
+  <div class="tip">Si algo de esto cambia (puntos, cuántos clasifican, tope de amarillas, valor de inscripción), se cambia en la hoja <code>CONFIG</code> del Sheet y la página lo toma sola.</div>
+</section>
+
+<section>
+  <h2>3. Reglas para que nunca se rompa</h2>
+  <ul>
+    <li><b>No cambies</b> los nombres de las hojas (<code>CONFIG</code>, <code>EQUIPOS</code>, <code>PARTIDOS</code>, <code>GOLES</code>, <code>TARJETAS</code>, <code>PAGOS</code>) ni los títulos de las columnas (fila 1).</li>
+    <li>Los equipos se escriben <b>igual que en la hoja <code>EQUIPOS</code></b>. Usá siempre las listas de la página; si escribís a mano, copiá y pegá.</li>
+    <li>Un partido sin jugar: <code>ESTADO = PENDIENTE</code> y <code>GL</code> / <code>GV</code> vacíos.</li>
+    <li>Cuando se juega: poné <code>GL</code> y <code>GV</code> y <code>ESTADO = JUGADO</code> (desde la página esto pasa solo).</li>
+    <li>El <code>ID</code> del partido (P001, P002…) une <code>PARTIDOS</code> con <code>GOLES</code> y <code>TARJETAS</code>. No lo repitas ni lo cambies.</li>
+    <li><b>No borres ni muevas el Sheet</b> y no le quites el acceso: debe seguir compartido como <i>“Cualquier persona con el enlace → Lector”</i>, si no la página no puede leerlo.</li>
+    <li>No uses “Hacer una copia” del Sheet para reemplazarlo: la copia tiene otro enlace y no trae el puente de escritura.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>4. Uso día a día</h2>
+
+  <h3>Programar la próxima jornada — pestaña Planificar</h3>
+  <ol>
+    <li>Elegí el grupo. La matriz muestra qué equipos <b>ya se enfrentaron</b> (✓) y cuáles <b>faltan</b> (+).</li>
+    <li>Tocá un “+” para cargar ese cruce, o usá <code>⚡ Armar jornada automática</code>: empareja a los que faltan sin repetir equipo (4 partidos por grupo).</li>
+    <li>Los partidos quedan en el <b>Borrador</b> (bloque 3). Ahí editás fecha, hora y equipos. Con <i>Programar todos de una vez</i> ponés la fecha y los horarios corridos (por defecto cada 60 min).</li>
+    <li>Tocá <code>💾 Guardar en el Sheet</code>. Los partidos aparecen en el calendario.</li>
+  </ol>
+
+  <h3>Cargar el resultado de un partido — Planificar, bloque 4</h3>
+  <ol>
+    <li>En <b>Partidos programados</b> buscá el partido y poné <code>GL</code> (goles del local) y <code>GV</code> (del visitante).</li>
+    <li>Tocá <code>💾 Guardar … en el Sheet</code>. El partido pasa a <i>jugado</i> y la tabla de posiciones se actualiza.</li>
+    <li>Si cambia el día o la hora, se edita en la misma fila. La <b>✕</b> borra un partido cargado por error.</li>
+  </ol>
+
+  <h3>Registrar goleadores — pestaña Goleadores</h3>
+  <ol>
+    <li>Arriba elegí el partido (los que tienen goles sin asignar salen primero con ⚠) y si es <b>Local</b> o <b>Visita</b>.</li>
+    <li>Escribí el jugador (autocompleta con los que ya jugaron) y los goles. Tocá <code>+ Agregar</code>.</li>
+    <li>La página avisa si te pasás del marcador o cuántos faltan. Al final <code>💾 Guardar en el Sheet</code>.</li>
+    <li>El bloque <b>Control de carga</b> muestra qué partidos todavía tienen goles sin goleador; tocá una fila y se carga arriba.</li>
+  </ol>
+  <div class="warn">Escribí el nombre del jugador siempre igual (nombre y apellido). Si hay nombres parecidos, la página lo avisa para que los unifiques.</div>
+
+  <h3>Tarjetas y suspensiones — pestaña Tarjetas</h3>
+  <ol>
+    <li>Se registran igual que los goles: partido, lado, jugador, amarillas y rojas.</li>
+    <li>Arriba aparecen los <b>suspendidos</b>: roja pendiente o tope de amarillas. Cuando cumple la fecha, botón <code>✔ cumplida</code>.</li>
+    <li>Con los filtros de <b>Categoría</b> y <b>Equipo</b> ves solo lo de un equipo. Arriba dice <i>“Datos subidos hasta la jornada X”</i>.</li>
+  </ol>
+
+  <h3>Mandar el calendario por WhatsApp — pestaña Calendario</h3>
+  <p>Filtrá la jornada, el equipo o el día y tocá <code>🖼 Descargar imagen</code>: sale un PNG con el logo, fecha, horarios y canchas, listo para compartir.</p>
+
+  <h3>Ver cómo va el campeonato</h3>
+  <p><b>Resumen, Posiciones, Goleadores, Tarjetas y Calendario</b> se recalculan solos cada vez que alguien abre la página. El botón <code>↻ Actualizar</code> vuelve a leer el Sheet. En Posiciones y Goleadores también podés bajar una imagen.</p>
+
+  <h3>Cobros — pestaña Pagos</h3>
+  <ol>
+    <li>Arriba elegí el equipo, el concepto (<code>INSCRIPCION</code>, <code>ARBITRAJE</code>, <code>ARBITRAJE ADEUDADO</code>, <code>MULTA</code> u <code>OTRO</code>), la jornada, la fecha y el valor. Tocá <code>+ Agregar</code> y luego <code>💾 Guardar en el Sheet</code>.</li>
+    <li><b>ARBITRAJE ADEUDADO</b> es lo que el equipo <i>debe</i> de arbitraje, no lo que pagó.</li>
+    <li>Tocá un equipo en la tabla para ver su <b>estado de cuenta</b>. Ahí podés corregir jornada, fecha o valor de un pago, borrarlo, o bajar una imagen para mandársela por WhatsApp.</li>
+    <li><b>Saldo pendiente = Inscripción − Abonado + Arbitraje adeudado.</b></li>
+  </ol>
+
+  <h3>Fases finales — pestaña Fases finales</h3>
+  <p>Propone los cruces con la tabla actual (A1 vs B4, A2 vs B3, A3 vs B2, A4 vs B1) y los manda al borrador con la fase ya puesta (<code>CUARTOS</code>). Después se programan como cualquier partido; las semifinales, el tercer puesto y la final se cargan con la columna <code>FASE</code> y no cuentan en la tabla de posiciones.</p>
+</section>
+
+<section>
+  <h2>5. Si algo no anda</h2>
+  <table>
+    <tr><th>Problema</th><th>Qué hacer</th></tr>
+    <tr><td>La página no muestra lo último</td><td>Tocá <code>↻ Actualizar</code>. Google puede tardar unos segundos en reflejar un cambio.</td></tr>
+    <tr><td>“No se guardó” / no confirma</td><td>Volvé a intentar. Si sigue igual, abrí el Sheet y mirá si la fila llegó. Revisá que el Apps Script siga publicado (acceso: cualquier persona).</td></tr>
+    <tr><td>Un equipo sale duplicado o un jugador aparece dos veces</td><td>Hay un nombre escrito distinto. Corregilo en la hoja <code>PARTIDOS</code>, <code>GOLES</code> o <code>TARJETAS</code> para que coincida con <code>EQUIPOS</code>.</td></tr>
+    <tr><td>La página dice “copia incrustada”</td><td>No pudo leer el Sheet (sin internet o sin acceso compartido). Mostrará la última copia hasta que vuelva.</td></tr>
+    <tr><td>Se borró una fila por error</td><td>En el Sheet: <i>Archivo → Historial de versiones</i> y restaurá una versión anterior.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>6. Para quien mantiene el sistema</h2>
+  <ul>
+    <li>El Sheet es la única fuente de datos. La página (<code>index.html</code>) no guarda nada por sí sola.</li>
+    <li>La conexión (<code>SHEET_ID</code> y la URL del puente <code>API_URL</code>) está al inicio de <code>index.html</code>, en el bloque <i>“Conexión con el Google Sheet”</i>.</li>
+    <li>Para ver cambios de diseño antes de publicar: doble clic en <code>VER EN LOCAL.bat</code> (necesita Node.js).</li>
+    <li>Para publicar un cambio de diseño: <code>node build.js</code>, luego <code>git add -A</code>, <code>git commit -m "…"</code> y <code>git push</code>. En un par de minutos queda en línea.</li>
+    <li>El puente de escritura es el archivo <code>APPS-SCRIPT.gs</code>: se pega una sola vez en el Sheet (<i>Extensiones → Apps Script</i>), se implementa como “Aplicación web”, ejecutar como <i>Yo</i>, acceso <i>Cualquier persona</i>.</li>
+  </ul>
+  <div class="warn">La URL del puente y el token quedan visibles en el código de la página. Para un campeonato entre conocidos alcanza.</div>
+</section>
+
+<p class="noprint" style="text-align:center;margin-top:24px">
+  <a class="btn" href="./">← Volver a la página</a>
+  <button class="btn" onclick="window.print()" style="margin-left:8px">🖨 Imprimir / guardar en PDF</button>
+</p>
+
+</main>
+</body>
+</html>
