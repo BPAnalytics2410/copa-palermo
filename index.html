@@ -636,7 +636,8 @@ function pares(cat){                       /* todos los cruces posibles y su est
 const faseDe = n => n>=16?'OCTAVOS' : n>=8?'CUARTOS' : n>=4?'SEMIFINAL' : 'FINAL';
 function golesSinAsignar(){
   const out=[];
-  S.partidos.filter(p=>p.jugado).forEach(p=>{
+  /* un partido ganado por "no se presentó" (estado WO) no tiene goleadores que asignar */
+  S.partidos.filter(p=>p.jugado&&p.estado.indexOf('WO')!==0).forEach(p=>{
     const reg = S.goles.filter(g=>g.pid&&g.pid===p.id).reduce((s,g)=>s+g.goles,0);
     const tot = p.gl+p.gv;
     if(!S.goles.some(g=>g.pid===p.id) || reg<tot) out.push({p,reg,tot,falta:tot-reg});
