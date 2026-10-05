@@ -182,6 +182,22 @@ tr.clasif .pos{color:var(--verde);font-weight:700}
 .bloq.ok h3{color:var(--verde)}
 .bloq.err h3{color:#ff8b83}
 .bloq .btn{margin-top:18px}
+/* editor de partido */
+.ed .box{max-width:780px}
+.ed .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:2}
+.ed .hd h3{font-size:19px}
+.ed .bd{padding:6px 16px 14px}
+.ed h4{font-size:15px;color:var(--ambar);margin:16px 0 6px}
+.ed table{min-width:0}
+.ed td{padding:4px 5px}
+.ed td input,.ed td select{padding:5px 7px}
+.ed .sum{font-size:12px;margin:2px 0 6px}
+.ed .sum.bad{color:var(--ambar)}.ed .sum.ok{color:var(--verde)}
+.ed .ft{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line);position:sticky;bottom:0;background:var(--panel)}
+.rowed{position:relative}
+.rowed .mt{padding-left:92px;padding-right:92px}
+.rowed .edbtn{position:absolute;right:10px;top:50%;transform:translateY(-50%)}
+@media(max-width:640px){.rowed .mt{padding-left:9px;padding-right:9px}.rowed .edbtn{position:static;transform:none;display:block;margin:0 auto 8px}}
 .warn{background:rgba(242,194,48,.1);border:1px solid rgba(242,194,48,.35);border-radius:10px;padding:10px 13px;font-size:12.5px}
 .warn b{color:var(--ambar)}
 .iq{margin-left:auto;flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);
@@ -236,7 +252,7 @@ code{background:#060a11;border:1px solid var(--line);border-radius:5px;padding:1
 
 <!-- Copia de los datos incrustada para que la página funcione incluso abriéndola con doble clic
      (sin servidor y sin internet). Se regenera con: node build.js -->
-<script id="seed" type="application/json">/*SEED*/{"CONFIG":{"NOMBRE_CAMPEONATO":"COPA PALERMO","SEDE":"COMPLEJO DEPORTIVO VELEZ AUTO","TEMPORADA":"PRIMERA EDICION","PTS_VICTORIA":3,"PTS_EMPATE":1,"PTS_DERROTA":0,"CLASIFICAN_POR_GRUPO":4,"DESEMPATE":"DG","AMARILLAS_SUSPENSION":3,"FECHAS_SUSPENSION_ROJA":1,"VALOR_INSCRIPCION_HOMBRES":100,"VALOR_ARBITRAJE_PARTIDO":0,"PREMIO_CAMPEON":800,"PREMIO_VICECAMPEON":400,"PREMIO_TERCERO":200,"PREMIO_CUARTO":100,"REGLA":"SIN MUNDIALITOS 2022 AL 2026","CONTACTO":"ANTHONY LOOR 096 329 7178"},"EQUIPOS":[{"CATEGORIA":"GRUPO A","EQUIPO":"ANTIKOLORIAS F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"EL CARTEL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"MONAY EL CRUCE","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"THE BROTHER","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"BAJO CERO","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"CEVICHERIA 12 DE ABRIL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"LOS RIOS","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"SANTANA F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"CLUB GAROFALOS","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"PEÑAZOL F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"MAGIC","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"REENCUENTRO F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"MANCHESTER","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"PISA RICO","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"UNION JUVENIL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"NAPOLI","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"}],"PARTIDOS":[],"GOLES":[],"TARJETAS":[],"PAGOS":[],"_actualizado":"2026-10-02"}/*/SEED*/</script>
+<script id="seed" type="application/json">/*SEED*/{"CONFIG":{"NOMBRE_CAMPEONATO":"COPA PALERMO","SEDE":"COMPLEJO DEPORTIVO VELEZ AUTO","TEMPORADA":"PRIMERA EDICION","PTS_VICTORIA":3,"PTS_EMPATE":1,"PTS_DERROTA":0,"CLASIFICAN_POR_GRUPO":4,"DESEMPATE":"DG","AMARILLAS_SUSPENSION":3,"FECHAS_SUSPENSION_ROJA":1,"VALOR_INSCRIPCION_HOMBRES":100,"VALOR_ARBITRAJE_PARTIDO":0,"PREMIO_CAMPEON":800,"PREMIO_VICECAMPEON":400,"PREMIO_TERCERO":200,"PREMIO_CUARTO":100,"REGLA":"SIN MUNDIALITOS 2022 AL 2026","CONTACTO":"ANTHONY LOOR 096 329 7178"},"EQUIPOS":[{"CATEGORIA":"GRUPO A","EQUIPO":"ANTIKOLORIAS F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"EL CARTEL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"MONAY EL CRUCE","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"THE BROTHER","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"BAJO CERO","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"CEVICHERIA 12 DE ABRIL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"LOS RIOS","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"SANTA ANA F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"CLUB GAROFALOS","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"PEÑAROL F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"MAGIC","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"REENCUENTRO F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"MANCHESTER","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"PISA RICO","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"UNION JUVENIL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"NAPOLI","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"}],"PARTIDOS":[],"GOLES":[],"TARJETAS":[],"PAGOS":[],"_actualizado":"2026-10-05"}/*/SEED*/</script>
 
 <footer>
   <span>Copa Palermo · Complejo Deportivo Velez Auto · <a href="manual.html">Manual de uso</a></span>
@@ -663,6 +679,11 @@ function subPartido(p,extra){
   if(!p.jugado&&has(p.hora)&&!has(p.fecha)) d.push('sin fecha');
   if(extra) d.push(extra);
   return d.filter(has).join(' · ');
+}
+/* en el Calendario, cada partido tiene su botón para corregirlo (solo si hay puente de escritura) */
+function filaEditable(p){
+  const b=filaPartido(p);
+  return hayAPI()? '<div class="rowed">'+b+'<button class="btn sm edbtn noprint" data-editp="'+esc(p.id)+'" title="Corregir este partido">✏ Editar</button></div>' : b;
 }
 function filaPartido(p,extra){
   const m=marcador(p), sub=subPartido(p,extra);
@@ -1162,7 +1183,7 @@ function tabCalendario(){
         (has(m.fecha)?' <span style="color:var(--txt);font-weight:600"> · '+esc(fechaTxt(m.fecha))+'</span>':
           ' <span style="color:var(--muted)"> · sin fecha</span>')+'</h4>'+
         '<span>'+jg+' de '+g.length+' jugados</span></div>'+
-        g.map(p=>filaPartido(p)).join('');
+        g.map(p=>filaEditable(p)).join('');
     }).join('') : '<div class="pad muted">No hay partidos con esos filtros.</div>')+
     '</div>';
 }
@@ -1696,6 +1717,7 @@ function enlazar(){
   const svp=$('#btnSavePagos'); if(svp) svp.onclick=guardarEdicionPagos;
   const udp=$('#btnUndoPagos'); if(udp) udp.onclick=()=>{ S.editPagos={}; render(); };
   const bi=$('#btnImg'); if(bi) bi.onclick=descargarImagen;
+  document.querySelectorAll('[data-editp]').forEach(b=>b.onclick=()=>abrirEditor(b.dataset.editp));
 
   /* íconos de ayuda */
   document.querySelectorAll('[data-ayuda]').forEach(b=>b.onclick=()=>{
@@ -2049,6 +2071,197 @@ async function borrarPartido(id){
     else bloqFin(true,'Borrado con éxito',
       id+' salió del Sheet'+(extra?', junto con '+extra:'')+'.');
   }catch(e){ bloqFin(false,'No se pudo borrar',e.message); }
+  finally{ S.guardando=false; }
+}
+
+/* ---------- EDITOR DE UN PARTIDO ----------
+   Desde el Calendario (botón ✏ Editar) se corrige todo lo de un partido:
+   fecha, hora, equipos, jornada, marcador, goleadores y tarjetas.
+   Usa las mismas acciones del puente que ya existen (borrar + agregar fila),
+   así que no hay que volver a publicar el Apps Script.                          */
+let _ed=null;
+const edLadoDe=(p,eq)=> eq===p.local?'L' : eq===p.visita?'V' : 'X';
+
+function abrirEditor(id){
+  const p=S.partidos.find(x=>x.id===id); if(!p) return;
+  if(!hayAPI()){ toast('Falta conectar el puente de escritura'); return; }
+  _ed={ id,
+    p:{ categoria:p.categoria, jornada:p.jornada, fecha:p.fecha, hora:p.hora, cancha:p.cancha,
+        local:p.local, visita:p.visita, gl:p.gl==null?'':p.gl, gv:p.gv==null?'':p.gv,
+        estado: p.jugado?'JUGADO' : p.estado==='SUSPENDIDO'?'SUSPENDIDO':'PENDIENTE' },
+    goles:S.goles.filter(g=>g.pid===id).map(g=>({lado:edLadoDe(p,g.equipo),eq:g.equipo,jugador:g.jugador,goles:g.goles})),
+    tarj:S.tarjetas.filter(t=>t.pid===id).map(t=>({lado:edLadoDe(p,t.equipo),eq:t.equipo,jugador:t.jugador,
+      am:t.am,ro:t.ro,sancion:t.sancion||''})) };
+  pintarEditor();
+}
+function edCerrar(){ const m=document.getElementById('edModal'); if(m) m.remove(); _ed=null; }
+
+function edLeer(){
+  if(!_ed) return;
+  const e=_ed, p=e.p, v=i=>document.getElementById(i).value;
+  p.jornada=v('edJornada'); p.fecha=v('edFecha'); p.hora=v('edHora'); p.cancha=v('edCancha').trim();
+  p.local=v('edLocal'); p.visita=v('edVisita'); p.gl=v('edGL'); p.gv=v('edGV'); p.estado=v('edEstado');
+  document.querySelectorAll('#edModal [data-k]').forEach(el=>{
+    const r=(el.dataset.k==='g'?e.goles:e.tarj)[+el.dataset.i]; if(r) r[el.dataset.f]=el.value;
+  });
+}
+function edResumen(){
+  if(!_ed) return;
+  edLeer();
+  const e=_ed, p=e.p, caja=document.getElementById('edSum'); if(!caja) return;
+  const suma=l=>e.goles.filter(r=>r.lado===l).reduce((s,r)=>s+num(r.goles),0);
+  const sl=suma('L'), sv=suma('V');
+  const ok=has(p.gl)&&has(p.gv)&&sl===num(p.gl)&&sv===num(p.gv);
+  caja.className='sum '+(ok?'ok':'bad');
+  caja.textContent='Goles con goleador: '+corto(p.local)+' '+sl+(has(p.gl)?' de '+p.gl:'')+' · '+
+    corto(p.visita)+' '+sv+(has(p.gv)?' de '+p.gv:'')+(ok?'  ✔':'');
+}
+
+function pintarEditor(){
+  const e=_ed, p=e.p;
+  const viejo=document.getElementById('edModal');
+  const scroll=viejo&&viejo.querySelector('.box')?viejo.querySelector('.box').scrollTop:0;
+  if(viejo) viejo.remove();
+  const base=[...new Set(equiposDe(p.categoria).concat([p.local,p.visita]))];
+  const opts=sel=>base.map(x=>'<option value="'+esc(x)+'"'+(x===sel?' selected':'')+'>'+esc(corto(x))+'</option>').join('');
+  const lados=(k,i,r)=>'<select data-k="'+k+'" data-i="'+i+'" data-f="lado">'+
+    '<option value="L"'+(r.lado==='L'?' selected':'')+'>'+esc(corto(p.local))+'</option>'+
+    '<option value="V"'+(r.lado==='V'?' selected':'')+'>'+esc(corto(p.visita))+'</option>'+
+    (r.lado==='X'?'<option value="X" selected>'+esc(corto(r.eq))+' (otro)</option>':'')+'</select>';
+  const nombres=[...new Set(jugadoresDe(p.local).concat(jugadoresDe(p.visita)))];
+  const inp=(k,i,f,val,extra)=>'<input data-k="'+k+'" data-i="'+i+'" data-f="'+f+'" value="'+esc(val)+'" '+(extra||'')+'>';
+
+  const filasG=e.goles.map((r,i)=>'<tr><td>'+lados('g',i,r)+'</td>'+
+    '<td>'+inp('g',i,'jugador',r.jugador,'list="edJug" placeholder="Jugador"')+'</td>'+
+    '<td style="width:78px">'+inp('g',i,'goles',r.goles,'type="number" min="1" style="text-align:center"')+'</td>'+
+    '<td class="n"><button class="btn sm" data-edel="g" data-i="'+i+'" title="Quitar">✕</button></td></tr>').join('');
+  const filasT=e.tarj.map((r,i)=>'<tr><td>'+lados('t',i,r)+'</td>'+
+    '<td>'+inp('t',i,'jugador',r.jugador,'list="edJug" placeholder="Jugador"')+'</td>'+
+    '<td style="width:64px">'+inp('t',i,'am',r.am,'type="number" min="0" title="Amarillas" style="text-align:center"')+'</td>'+
+    '<td style="width:64px">'+inp('t',i,'ro',r.ro,'type="number" min="0" title="Rojas" style="text-align:center"')+'</td>'+
+    '<td style="width:120px"><select data-k="t" data-i="'+i+'" data-f="sancion">'+
+      ['','PENDIENTE','CUMPLIDA'].map(x=>'<option value="'+x+'"'+(x===(r.sancion||'')?' selected':'')+'>'+(x||'—')+'</option>').join('')+'</select></td>'+
+    '<td class="n"><button class="btn sm" data-edel="t" data-i="'+i+'" title="Quitar">✕</button></td></tr>').join('');
+
+  const m=document.createElement('div');
+  m.className='modal ed'; m.id='edModal';
+  m.innerHTML='<div class="box">'+
+    '<div class="hd"><h3>✏ Editar partido '+esc(e.id)+' <span class="muted" style="font-family:var(--sans);font-size:12px;text-transform:none">· '+esc(p.categoria)+'</span></h3>'+
+      '<button class="btn sm" id="edClose">✕</button></div>'+
+    '<div class="bd">'+
+    '<div class="row">'+
+      '<div style="flex:0 0 90px"><label>Jornada</label><input id="edJornada" type="number" min="1" value="'+esc(p.jornada)+'"></div>'+
+      '<div><label>Fecha</label><input id="edFecha" type="date" value="'+esc(p.fecha)+'"></div>'+
+      '<div style="flex:0 0 120px"><label>Hora</label><input id="edHora" type="time" value="'+esc(p.hora)+'"></div>'+
+      '<div><label>Cancha</label><input id="edCancha" value="'+esc(p.cancha)+'"></div>'+
+    '</div>'+
+    '<div class="row" style="margin-top:10px">'+
+      '<div style="flex:2 1 170px"><label>Local</label><select id="edLocal">'+opts(p.local)+'</select></div>'+
+      '<div style="flex:0 0 70px"><label>GL</label><input id="edGL" type="number" min="0" value="'+esc(p.gl)+'" style="text-align:center"></div>'+
+      '<div style="flex:0 0 70px"><label>GV</label><input id="edGV" type="number" min="0" value="'+esc(p.gv)+'" style="text-align:center"></div>'+
+      '<div style="flex:2 1 170px"><label>Visita</label><select id="edVisita">'+opts(p.visita)+'</select></div>'+
+      '<div style="flex:1 1 130px"><label>Estado</label><select id="edEstado">'+
+        ['JUGADO','PENDIENTE','SUSPENDIDO'].map(x=>'<option'+(x===p.estado?' selected':'')+'>'+x+'</option>').join('')+'</select></div>'+
+    '</div>'+
+    '<div class="muted" style="font-size:11.5px;margin-top:6px">Si el partido todavía no se jugó, dejá GL y GV vacíos. Con los dos marcadores puestos pasa solo a “jugado”.</div>'+
+    '<h4>Goleadores</h4><div id="edSum" class="sum"></div>'+
+    '<div class="tw"><table><thead><tr><th>Equipo</th><th>Jugador</th><th class="n">Goles</th><th></th></tr></thead><tbody>'+
+      (filasG||'<tr><td colspan="4" class="muted">Sin goleadores cargados.</td></tr>')+'</tbody></table></div>'+
+    '<button class="btn sm" id="edAddG" style="margin-top:8px">+ Agregar goleador</button>'+
+    '<h4>Tarjetas</h4>'+
+    '<div class="tw"><table><thead><tr><th>Equipo</th><th>Jugador</th><th class="n">🟨</th><th class="n">🟥</th><th>Sanción</th><th></th></tr></thead><tbody>'+
+      (filasT||'<tr><td colspan="6" class="muted">Sin tarjetas cargadas.</td></tr>')+'</tbody></table></div>'+
+    '<button class="btn sm" id="edAddT" style="margin-top:8px">+ Agregar tarjeta</button>'+
+    '<datalist id="edJug">'+nombres.map(n=>'<option value="'+esc(n)+'">').join('')+'</datalist>'+
+    '</div>'+
+    '<div class="ft"><button class="btn pri" id="edSave">💾 Guardar cambios</button>'+
+      '<button class="btn" id="edCancel">Cancelar</button>'+
+      '<button class="btn" id="edBorrar" style="margin-left:auto;color:#ff8b83">🗑 Borrar partido</button></div>'+
+    '</div>';
+  document.body.appendChild(m);
+  m.querySelector('.box').scrollTop=scroll;
+
+  m.onclick=ev=>{ if(ev.target===m) edCerrar(); };
+  m.oninput=edResumen;
+  m.querySelector('#edClose').onclick=m.querySelector('#edCancel').onclick=edCerrar;
+  m.querySelector('#edSave').onclick=edGuardar;
+  m.querySelector('#edBorrar').onclick=()=>{ const id=e.id; edCerrar(); borrarPartido(id); };
+  m.querySelector('#edAddG').onclick=()=>{ edLeer(); e.goles.push({lado:'L',eq:'',jugador:'',goles:1}); pintarEditor(); };
+  m.querySelector('#edAddT').onclick=()=>{ edLeer(); e.tarj.push({lado:'L',eq:'',jugador:'',am:1,ro:0,sancion:''}); pintarEditor(); };
+  m.querySelectorAll('[data-edel]').forEach(b=>b.onclick=()=>{
+    edLeer(); (b.dataset.edel==='g'?e.goles:e.tarj).splice(+b.dataset.i,1); pintarEditor(); });
+  m.querySelector('#edLocal').onchange=m.querySelector('#edVisita').onchange=()=>{ edLeer(); pintarEditor(); };
+  edResumen();
+}
+document.addEventListener('keydown',ev=>{ if(ev.key==='Escape'&&document.getElementById('edModal')&&!_bloq) edCerrar(); });
+
+async function edGuardar(){
+  if(!_ed||S.guardando) return;
+  edLeer();
+  const e=_ed, p=e.p, id=e.id, orig=S.partidos.find(x=>x.id===id);
+  if(!orig){ toast('El partido ya no existe'); edCerrar(); return; }
+  if(p.local===p.visita){ toast('Local y visita no pueden ser el mismo equipo'); return; }
+  if(has(p.gl)!==has(p.gv)){ toast('Poné los dos marcadores (GL y GV) o dejá los dos vacíos'); return; }
+
+  const ambos=has(p.gl)&&has(p.gv);
+  const estado = p.estado==='SUSPENDIDO'?'SUSPENDIDO' : ambos ? (orig.estado.indexOf('WO')===0?orig.estado:'JUGADO') : 'PENDIENTE';
+  const nuevo={ jornada:has(p.jornada)?num(p.jornada):'', fecha:p.fecha||'', hora:p.hora||'', cancha:p.cancha||'',
+    local:p.local, visita:p.visita, gl:ambos?num(p.gl):'', gv:ambos?num(p.gv):'', estado };
+  const equipoDe=r=>r.lado==='L'?p.local : r.lado==='V'?p.visita : r.eq;
+  const goles=e.goles.map(r=>({equipo:equipoDe(r),jugador:up(r.jugador),goles:num(r.goles)}))
+    .filter(x=>x.jugador&&x.goles>0);
+  const tarj=e.tarj.map(r=>({equipo:equipoDe(r),jugador:up(r.jugador),am:num(r.am),ro:num(r.ro),
+    sancion:num(r.ro)>0?(r.sancion||'PENDIENTE'):''})).filter(x=>x.jugador&&(x.am>0||x.ro>0));
+
+  const oG=S.goles.filter(g=>g.pid===id), oT=S.tarjetas.filter(t=>t.pid===id);
+  const kG=a=>a.map(x=>[x.equipo,x.jugador,x.goles].join('|')).sort().join(';');
+  const kT=a=>a.map(x=>[x.equipo,x.jugador,x.am,x.ro,x.sancion||''].join('|')).sort().join(';');
+  const antes={ jornada:orig.jornada===''?'':num(orig.jornada), fecha:orig.fecha||'', hora:orig.hora||'', cancha:orig.cancha||'',
+    local:orig.local, visita:orig.visita, gl:orig.gl==null?'':orig.gl, gv:orig.gv==null?'':orig.gv, estado:orig.estado };
+  const cambioP=Object.keys(nuevo).some(k=>String(nuevo[k])!==String(antes[k]));
+  const estructura=nuevo.local!==antes.local||nuevo.visita!==antes.visita||String(nuevo.jornada)!==String(antes.jornada);
+  const rehacerG=(kG(goles)!==kG(oG)||estructura)&&(goles.length||oG.length);
+  const rehacerT=(kT(tarj)!==kT(oT)||estructura)&&(tarj.length||oT.length);
+  if(!cambioP&&!rehacerG&&!rehacerT){ toast('No hay cambios para guardar'); return; }
+
+  S.guardando=true;
+  bloqAbrir('Guardando los cambios del partido '+id+'…','No toques nada hasta que termine.');
+  LSset('cp_copia_ultima_edicion',JSON.stringify({id,fecha:new Date().toISOString(),partido:orig,goles:oG,tarjetas:oT}));
+  try{
+    if(cambioP){
+      await apiPost({action:'borrarFilas',hoja:'PARTIDOS',columna:'ID',valor:id}); await esperar(1100);
+      await apiPost({action:'append',hoja:'PARTIDOS',rows:[[id,orig.categoria,orig.fase,nuevo.jornada,nuevo.fecha,nuevo.hora,
+        nuevo.cancha,nuevo.local,nuevo.gl,nuevo.gv,nuevo.visita,nuevo.estado,orig.obs||'']]}); await esperar(1100);
+    }
+    if(rehacerG){
+      if(oG.length){ await apiPost({action:'borrarGoles',pid:id}); await esperar(1100); }
+      if(goles.length){ await apiPost({action:'append',hoja:'GOLES',
+        rows:goles.map(x=>[id,orig.categoria,nuevo.jornada,x.equipo,x.jugador,x.goles])}); await esperar(1100); }
+    }
+    if(rehacerT){
+      if(oT.length){ await apiPost({action:'borrarFilas',hoja:'TARJETAS',columna:'PARTIDO_ID',valor:id}); await esperar(1100); }
+      if(tarj.length){ await apiPost({action:'append',hoja:'TARJETAS',
+        rows:tarj.map(x=>[id,orig.categoria,nuevo.jornada,x.equipo,x.jugador,x.am,x.ro,x.sancion,''])}); await esperar(1100); }
+    }
+    bloqTexto('Verificando…','Estoy releyendo el Sheet para confirmar que quedó todo.');
+    const llego=()=>{
+      const q=S.partidos.find(x=>x.id===id); if(!q) return false;
+      if(cambioP){
+        if(String(q.jornada)!==String(nuevo.jornada)||q.local!==nuevo.local||q.visita!==nuevo.visita||
+           q.fecha!==nuevo.fecha||q.hora!==nuevo.hora) return false;
+        if((nuevo.gl===''?q.gl!=null:String(q.gl)!==String(nuevo.gl))||
+           (nuevo.gv===''?q.gv!=null:String(q.gv)!==String(nuevo.gv))) return false;
+      }
+      if(rehacerG&&kG(S.goles.filter(g=>g.pid===id))!==kG(goles)) return false;
+      if(rehacerT&&kT(S.tarjetas.filter(t=>t.pid===id))!==kT(tarj)) return false;
+      return true;
+    };
+    let ok=false;
+    for(let i=1;i<=5&&!ok;i++){ await esperar(i===1?2200:2500); await cargar(); ok=llego(); }
+    edCerrar(); render();
+    if(ok) bloqFin(true,'Cambios guardados','El partido '+id+' quedó actualizado en el Sheet.');
+    else bloqFin(false,'No se pudo confirmar','Revisá el partido '+id+'. Si algo quedó mal, volvé a abrir ✏ Editar y corregilo.');
+  }catch(err){ bloqFin(false,'No se pudo guardar',err.message); }
   finally{ S.guardando=false; }
 }
 
