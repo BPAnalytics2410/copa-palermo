@@ -1370,6 +1370,9 @@ function tabFases(){
   h+='<div class="card" style="margin-bottom:14px"><h2>Cruces propuestos · '+faseDe(n*2).toLowerCase()+
     ' <span class="sub">'+(todos?'clasifican todos ('+n+' por grupo)':'clasifican '+n+' por grupo')+
     ' · el 1.º de A contra el último de B, el 2.º contra el penúltimo, y así</span></h2><div class="pad">'+
+    (todos?'':'<div class="warn noprint" style="margin-bottom:12px">Ahora están clasificando <b>'+n+'</b> por grupo. '+
+      'Para que clasifiquen <b>todos los equipos</b>, en el Google Sheet abrí la hoja <code>CONFIG</code> y en la fila '+
+      '<code>CLASIFICAN_POR_GRUPO</code> escribí <code>TODOS</code> en la columna VALOR. Después tocá ↻ Actualizar.</div>')+
     '<div class="brk"><div class="col"><h4>Llave</h4>'+
       (cruces.length? cruces.map(c=>tie(c.lbl,c.local,c.visita,null,null)).join('') : '<div class="muted">Faltan datos</div>')+
     '</div></div>'+
