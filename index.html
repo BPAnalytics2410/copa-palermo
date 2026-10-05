@@ -252,7 +252,7 @@ code{background:#060a11;border:1px solid var(--line);border-radius:5px;padding:1
 
 <!-- Copia de los datos incrustada para que la página funcione incluso abriéndola con doble clic
      (sin servidor y sin internet). Se regenera con: node build.js -->
-<script id="seed" type="application/json">/*SEED*/{"CONFIG":{"NOMBRE_CAMPEONATO":"COPA PALERMO","SEDE":"COMPLEJO DEPORTIVO VELEZ AUTO","TEMPORADA":"PRIMERA EDICION","PTS_VICTORIA":3,"PTS_EMPATE":1,"PTS_DERROTA":0,"CLASIFICAN_POR_GRUPO":4,"DESEMPATE":"DG","AMARILLAS_SUSPENSION":3,"FECHAS_SUSPENSION_ROJA":1,"VALOR_INSCRIPCION_HOMBRES":100,"VALOR_ARBITRAJE_PARTIDO":0,"PREMIO_CAMPEON":800,"PREMIO_VICECAMPEON":400,"PREMIO_TERCERO":200,"PREMIO_CUARTO":100,"REGLA":"SIN MUNDIALITOS 2022 AL 2026","CONTACTO":"ANTHONY LOOR 096 329 7178"},"EQUIPOS":[{"CATEGORIA":"GRUPO A","EQUIPO":"ANTIKOLORIAS F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"EL CARTEL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"MONAY EL CRUCE","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"THE BROTHER","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"BAJO CERO","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"CEVICHERIA 12 DE ABRIL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"LOS RIOS","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"SANTA ANA F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"CLUB GAROFALOS","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"PEÑAROL F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"MAGIC","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"REENCUENTRO F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"MANCHESTER","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"PISA RICO","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"UNION JUVENIL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"NAPOLI","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"}],"PARTIDOS":[],"GOLES":[],"TARJETAS":[],"PAGOS":[],"_actualizado":"2026-10-05"}/*/SEED*/</script>
+<script id="seed" type="application/json">/*SEED*/{"CONFIG":{"NOMBRE_CAMPEONATO":"COPA PALERMO","SEDE":"COMPLEJO DEPORTIVO VELEZ AUTO","TEMPORADA":"PRIMERA EDICION","PTS_VICTORIA":3,"PTS_EMPATE":1,"PTS_DERROTA":0,"CLASIFICAN_POR_GRUPO":"TODOS","DESEMPATE":"DG","AMARILLAS_SUSPENSION":3,"FECHAS_SUSPENSION_ROJA":1,"VALOR_INSCRIPCION_HOMBRES":100,"VALOR_ARBITRAJE_PARTIDO":0,"PREMIO_CAMPEON":800,"PREMIO_VICECAMPEON":400,"PREMIO_TERCERO":200,"PREMIO_CUARTO":100,"REGLA":"SIN MUNDIALITOS 2022 AL 2026","CONTACTO":"ANTHONY LOOR 096 329 7178"},"EQUIPOS":[{"CATEGORIA":"GRUPO A","EQUIPO":"ANTIKOLORIAS F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"EL CARTEL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"MONAY EL CRUCE","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"THE BROTHER","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"BAJO CERO","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"CEVICHERIA 12 DE ABRIL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"LOS RIOS","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO A","EQUIPO":"SANTA ANA F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"CLUB GAROFALOS","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"PEÑAROL F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"MAGIC","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"REENCUENTRO F.C","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"MANCHESTER","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"PISA RICO","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"UNION JUVENIL","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"},{"CATEGORIA":"GRUPO B","EQUIPO":"NAPOLI","DELEGADO":"","TELEFONO":"","ACTIVO":"SI"}],"PARTIDOS":[],"GOLES":[],"TARJETAS":[],"PAGOS":[],"_actualizado":"2026-10-05"}/*/SEED*/</script>
 
 <footer>
   <span>Copa Palermo · Complejo Deportivo Velez Auto · <a href="manual.html">Manual de uso</a></span>
@@ -283,7 +283,7 @@ const API_TOKEN = 'palermo2026';
 
 const SHEETS = ['CONFIG','EQUIPOS','PARTIDOS','GOLES','TARJETAS','PAGOS'];
 const CATS   = ['GRUPO A','GRUPO B'];
-const FASES  = ['OCTAVOS','CUARTOS','SEMIFINAL','TERCER PUESTO','FINAL'];
+const FASES  = ['MUERTE SUBITA','OCTAVOS','CUARTOS','SEMIFINAL','TERCER PUESTO','FINAL'];
 const LS_DRAFT = 'cp_borrador';
 
 const S = {
@@ -535,7 +535,12 @@ function normalizar(){
 /* ---------- cálculo ---------- */
 const PV = ()=>num(S.cfg.PTS_VICTORIA)||3;
 const PE = ()=>num(S.cfg.PTS_EMPATE)||1;
-const clasN = c => num(c==='FEMENINO'? (S.cfg.CLASIFICAN_FEMENINO||S.cfg.CLASIFICAN_POR_GRUPO) : S.cfg.CLASIFICAN_POR_GRUPO)||4;
+/* cuántos clasifican por grupo: un número, o la palabra TODOS (clasifican todos los equipos del grupo) */
+const clasN = c => {
+  const v = up(c==='FEMENINO'? (S.cfg.CLASIFICAN_FEMENINO||S.cfg.CLASIFICAN_POR_GRUPO) : S.cfg.CLASIFICAN_POR_GRUPO);
+  if(v==='TODOS') return equiposDe(c).length||4;
+  return num(v)||4;
+};
 const equiposDe = c => S.equipos.filter(e=>e.categoria===c&&e.activo).map(e=>e.equipo);
 const partidosDe = (c,fase) => S.partidos.filter(p=>p.categoria===c&&(fase?p.fase===fase:true));
 
@@ -633,7 +638,8 @@ function pares(cat){                       /* todos los cruces posibles y su est
   return out;
 }
 /* nombre de la fase segun cuantos equipos entran a la eliminatoria */
-const faseDe = n => n>=16?'OCTAVOS' : n>=8?'CUARTOS' : n>=4?'SEMIFINAL' : 'FINAL';
+/* nombre de la ronda según cuántos equipos juegan: si no es una llave pareja (por ejemplo 20), es muerte súbita */
+const faseDe = n => n===2?'FINAL' : n===4?'SEMIFINAL' : n===8?'CUARTOS' : n===16?'OCTAVOS' : 'MUERTE SUBITA';
 function golesSinAsignar(){
   const out=[];
   /* un partido ganado por "no se presentó" (estado WO) no tiene goleadores que asignar */
@@ -1337,8 +1343,10 @@ function tabPlanificar(){
 
 /* ---------- FASES FINALES ---------- */
 function tabFases(){
-  const n=clasN('GRUPO A');
   const A=tabla('GRUPO A'), B=tabla('GRUPO B');
+  /* cuántos se cruzan: los que clasifican, sin pasarse de los equipos que haya en cada grupo */
+  const n=Math.min(clasN('GRUPO A'),A.length,B.length);
+  const todos=n>=A.length&&n>=B.length;
   const reales=S.partidos.filter(p=>p.fase!=='GRUPOS');
   const cruces=[];
   for(let i=0;i<n;i++){
@@ -1359,8 +1367,9 @@ function tabFases(){
         porFase[f].map(p=>filaPartido(p,p.categoria)).join('')).join('')+'</div>';
   }
 
-  h+='<div class="card" style="margin-bottom:14px"><h2>Cruces propuestos '+
-    '<span class="sub">top '+n+' de cada grupo</span></h2><div class="pad">'+
+  h+='<div class="card" style="margin-bottom:14px"><h2>Cruces propuestos · '+faseDe(n*2).toLowerCase()+
+    ' <span class="sub">'+(todos?'clasifican todos ('+n+' por grupo)':'clasifican '+n+' por grupo')+
+    ' · el 1.º de A contra el último de B, el 2.º contra el penúltimo, y así</span></h2><div class="pad">'+
     '<div class="brk"><div class="col"><h4>Llave</h4>'+
       (cruces.length? cruces.map(c=>tie(c.lbl,c.local,c.visita,null,null)).join('') : '<div class="muted">Faltan datos</div>')+
     '</div></div>'+
@@ -1762,7 +1771,7 @@ function mandarCruces(tipo){
   const A=tabla('GRUPO A'), B=tabla('GRUPO B');
   const nid=nextId(); let k=0;
   {
-    const n=clasN('GRUPO A'), fase=faseDe(n*2);
+    const n=Math.min(clasN('GRUPO A'),A.length,B.length), fase=faseDe(n*2);
     for(let i=0;i<n;i++){ const a=A[i],b=B[n-1-i]; if(!a||!b) continue;
       S.borrador.push({id:nid(++k),categoria:'GRUPO A',fase,jornada:'',fecha:'',hora:'',cancha:'',local:a.equipo,visita:b.equipo}); }
   }

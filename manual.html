@@ -73,7 +73,7 @@ th{color:var(--muted);font-family:'Barlow Condensed',sans-serif;text-transform:u
     <tr><td>Grupos</td><td>Grupo A y Grupo B, 8 equipos cada uno</td></tr>
     <tr><td>Inscripción</td><td>$100 por equipo</td></tr>
     <tr><td>Puntos</td><td>Victoria 3 · empate 1 · derrota 0</td></tr>
-    <tr><td>Clasifican</td><td>Los 4 primeros de cada grupo (cuartos de final)</td></tr>
+    <tr><td>Clasifican</td><td>Todos los equipos (10 por grupo). Primera ronda de muerte súbita: el 1.º de A contra el último de B, y así</td></tr>
     <tr><td>Suspensión</td><td>3 amarillas acumuladas · roja = 1 fecha</td></tr>
     <tr><td>Premios</td><td>Campeón $800 · Vicecampeón $400 · Tercero $200 · Cuarto $100</td></tr>
     <tr><td>Sede</td><td>Complejo Deportivo Velez Auto (Monay Baguanchi)</td></tr>
@@ -151,7 +151,7 @@ th{color:var(--muted);font-family:'Barlow Condensed',sans-serif;text-transform:u
   </ol>
 
   <h3>Fases finales — pestaña Fases finales</h3>
-  <p>Propone los cruces con la tabla actual (A1 vs B4, A2 vs B3, A3 vs B2, A4 vs B1) y los manda al borrador con la fase ya puesta (<code>CUARTOS</code>). Después se programan como cualquier partido; las semifinales, el tercer puesto y la final se cargan con la columna <code>FASE</code> y no cuentan en la tabla de posiciones.</p>
+  <p>Propone los cruces con la tabla actual: el 1.º del Grupo A contra el último del Grupo B, el 2.º contra el penúltimo, y así. Si clasifican todos, esa primera ronda es de <b>muerte súbita</b>. Los manda al borrador con la fase ya puesta (<code>MUERTE SUBITA</code>). Las rondas siguientes (octavos, cuartos, semifinal, tercer puesto y final) se agregan en Planificar eligiendo la fase; no cuentan en la tabla de posiciones.</p>
 </section>
 
 <section>
