@@ -320,6 +320,26 @@ const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&l
 function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
   document.body.appendChild(t); setTimeout(()=>t.remove(),2300); }
 
+/* Confirmación propia en vez de confirm() nativo: en el navegador de dentro de WhatsApp
+   (y otros in-app browsers) confirm()/alert() a veces no aparece o queda bloqueado,
+   y los botones de borrar parecen "no hacer nada". Esto funciona siempre igual. */
+function confirmar(mensaje){
+  return new Promise(resolve=>{
+    const m=document.createElement('div');
+    m.className='modal';
+    m.innerHTML='<div class="box" style="max-width:420px;padding:26px 28px;text-align:center">'+
+      '<p style="white-space:pre-line;font-size:14px;line-height:1.5;margin:0 0 18px">'+esc(mensaje)+'</p>'+
+      '<div style="display:flex;gap:10px;justify-content:center">'+
+      '<button class="btn pri" id="cfOk">Sí, borrar</button>'+
+      '<button class="btn" id="cfNo">Cancelar</button></div></div>';
+    document.body.appendChild(m);
+    const cerrar=v=>{ m.remove(); resolve(v); };
+    m.querySelector('#cfOk').onclick=()=>cerrar(true);
+    m.querySelector('#cfNo').onclick=()=>cerrar(false);
+    m.onclick=e=>{ if(e.target===m) cerrar(false); };
+  });
+}
+
 /* ---------- pantalla de "guardando" que bloquea la página ----------
    Mientras se escribe en el Sheet no se puede tocar nada más, y al final
    avisa si salió bien o si falló.                                          */
@@ -1952,7 +1972,7 @@ function enlazar(){
     S.borrador.splice(+b.dataset.del,1); guardarBorrador(); render(); });
   const cp=$('#btnCopy'); if(cp) cp.onclick=()=>{ copiar(borradorTSV()); };
   const cs=$('#btnCsv'); if(cs) cs.onclick=descargarCSV;
-  const cl=$('#btnClear'); if(cl) cl.onclick=()=>{ if(confirm('¿Vaciar el borrador?')){ S.borrador=[]; guardarBorrador(); render(); } };
+  const cl=$('#btnClear'); if(cl) cl.onclick=async()=>{ if(await confirmar('¿Vaciar el borrador?')){ S.borrador=[]; guardarBorrador(); render(); } };
   document.querySelectorAll('[data-ronda]').forEach(b=>b.onclick=()=>mandarRonda(b.dataset.ronda));
   document.querySelectorAll('[data-irfases]').forEach(b=>b.onclick=()=>{ S.tab='fases'; render(); window.scrollTo({top:0,behavior:'smooth'}); });
   document.querySelectorAll('[data-cruceunico]').forEach(b=>b.onclick=()=>enviarCrucePuntual(b.dataset.cruceunico));
@@ -2166,7 +2186,7 @@ async function rtGuardar(){
   if(ok){ S.tarjNuevas=[]; render(); }
 }
 async function marcarCumplida(pid,jugador){
-  if(!confirm('¿'+jugador+' ya cumplió la fecha de suspensión?')) return;
+  if(!(await confirmar('¿'+jugador+' ya cumplió la fecha de suspensión?'))) return;
   S.guardando=true;
   bloqAbrir('Actualizando el Sheet…','Marcando la sanción de '+jugador+' como cumplida.');
   try{
@@ -2209,8 +2229,8 @@ async function rpGuardar(){
 }
 async function borrarPago(clave){
   const [categoria,equipo,concepto,cuota,fecha,valor]=clave.split('||');
-  if(!confirm('¿Borrar este pago?\n\n'+corto(equipo)+' ('+categoria+')\n'+concepto+' · $'+valor+
-    (has(fecha)?' · '+fechaTxt(fecha):'')+'\n\nEsto no se puede deshacer.')) return;
+  if(!(await confirmar('¿Borrar este pago?\n\n'+corto(equipo)+' ('+categoria+')\n'+concepto+' · $'+valor+
+    (has(fecha)?' · '+fechaTxt(fecha):'')+'\n\nEsto no se puede deshacer.'))) return;
   if(S.guardando) return;
   S.guardando=true;
   bloqAbrir('Borrando el pago…','No toques nada hasta que termine.');
@@ -2371,8 +2391,8 @@ async function borrarPartido(id){
   const tarj=S.tarjetas.filter(t=>t.pid===id).length;
   const extra=[goles?goles+' goleador'+(goles>1?'es':''):'',tarj?tarj+' tarjeta'+(tarj>1?'s':''):'']
     .filter(Boolean).join(' y ');
-  if(!confirm('¿Borrar el partido '+id+' del Sheet?\n\n'+corto(p.local)+' vs '+corto(p.visita)+
-    (extra? '\n\nTambién se borra: '+extra+'.' : '')+'\n\nEsto no se puede deshacer.')) return;
+  if(!(await confirmar('¿Borrar el partido '+id+' del Sheet?\n\n'+corto(p.local)+' vs '+corto(p.visita)+
+    (extra? '\n\nTambién se borra: '+extra+'.' : '')+'\n\nEsto no se puede deshacer.'))) return;
   if(S.guardando) return;
   S.guardando=true;
   bloqAbrir('Borrando el partido '+id+'…','No toques nada hasta que termine.');
