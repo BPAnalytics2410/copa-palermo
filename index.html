@@ -817,7 +817,9 @@ function tabla(cat){
            a.h2h[b.equipo]+=PE(); b.h2h[a.equipo]+=PE(); }
   });
   const h2h = (x,y) => (y.h2h[x.equipo]||0)-(x.h2h[y.equipo]||0);
-  return Object.values(T).map(t=>({...t,dg:t.gf-t.gc})).sort((x,y)=>
+  /* un equipo que ya no está en EQUIPOS (se retiró) no aparece en la tabla ni clasifica,
+     pero los puntos que ya les ganaron sus rivales quedan (arriba ya se sumaron).        */
+  return Object.values(T).filter(t=>!t.extra).map(t=>({...t,dg:t.gf-t.gc})).sort((x,y)=>
     desempateEntreEllos()
       ? (y.pts-x.pts || h2h(x,y) || y.dg-x.dg || y.gf-x.gf || x.equipo.localeCompare(y.equipo))
       : (y.pts-x.pts || y.dg-x.dg || y.gf-x.gf || h2h(x,y) || x.equipo.localeCompare(y.equipo)));
