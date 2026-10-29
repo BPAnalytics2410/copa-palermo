@@ -282,9 +282,22 @@ const API_TOKEN = 'palermo2026';
 /* ══════════════════════════════════════════════════════════════════════════ */
 
 const SHEETS = ['CONFIG','EQUIPOS','PARTIDOS','GOLES','TARJETAS','PAGOS'];
-const CATS   = ['GRUPO A','GRUPO B'];
+const CATS   = ['GRUPO A','GRUPO B','DAMAS NIVEL MEDIO','FAMILIAR VARONES'];
 const FASES  = ['MUERTE SUBITA','OCTAVOS','CUARTOS','SEMIFINAL','TERCER PUESTO','FINAL'];
 const LS_DRAFT = 'cp_borrador';
+
+/* Series del campeonato: Hombres junta GRUPO A + GRUPO B (se cruzan entre sí en
+   las eliminatorias); Damas y Familiar son un solo grupo cada una. Cada serie
+   tiene su propia llave de fases finales, independiente de las otras.         */
+const TRACKS = [
+  {id:'H', nombre:'Hombres',            cats:['GRUPO A','GRUPO B'],        todas:['GRUPO A','GRUPO B','HOMBRES']},
+  {id:'D', nombre:'Damas Nivel Medio',  cats:['DAMAS NIVEL MEDIO'],        todas:['DAMAS NIVEL MEDIO']},
+  {id:'F', nombre:'Familiar Varones',   cats:['FAMILIAR VARONES'],         todas:['FAMILIAR VARONES']}
+];
+const trackDe   = id => TRACKS.find(t=>t.id===id);
+const esDeTrack = (p,track) => trackDe(track).todas.includes(p.categoria);
+const catTrack  = track => trackDe(track).cats[0];      /* para catPartido() */
+const enTrackCat = (categoria,track) => trackDe(track).todas.includes(categoria);
 
 const S = {
   cfg:{}, equipos:[], partidos:[], goles:[], tarjetas:[], pagos:[],
@@ -492,9 +505,11 @@ async function cargar(){
   /* los cruces de eliminatoria mandados antes de poder editarlos no tienen slotKey (la posición
      en la llave): se les asigna una, en el orden en que se crearon, para que ya se puedan editar. */
   RONDAS.concat(['TERCER PUESTO','MUERTE SUBITA']).forEach(fase=>{
-    S.borrador.filter(p=>p.fase===fase&&p.slotKey===undefined)
-      .sort((a,b)=>idNum(a)-idNum(b))
-      .forEach((p,i)=>{ p.slotKey='H|'+fase+'|'+i; });
+    TRACKS.forEach(t=>{
+      S.borrador.filter(p=>p.fase===fase&&p.slotKey===undefined&&t.todas.includes(p.categoria))
+        .sort((a,b)=>idNum(a)-idNum(b))
+        .forEach((p,i)=>{ p.slotKey=t.id+'|'+fase+'|'+i; });
+    });
   });
   if(SHEET_ID){
     try{ await cargarSheets(SHEET_ID); S.origen='Google Sheets'; return; }
@@ -564,9 +579,14 @@ function normalizar(){
 /* ---------- cálculo ---------- */
 const PV = ()=>num(S.cfg.PTS_VICTORIA)||3;
 const PE = ()=>num(S.cfg.PTS_EMPATE)||1;
-/* cuántos clasifican por grupo: un número, o la palabra TODOS (clasifican todos los equipos del grupo) */
+/* cuántos clasifican por grupo: un número, o la palabra TODOS (clasifican todos los equipos del grupo).
+   Cada categoría puede tener su propio tope (CLASIFICAN_DAMAS, CLASIFICAN_FAMILIAR); si no está puesto
+   en el Sheet, usa el mismo CLASIFICAN_POR_GRUPO de Hombres.                                           */
+const CLASIFICAN_KEY = {'DAMAS NIVEL MEDIO':'CLASIFICAN_DAMAS','FAMILIAR VARONES':'CLASIFICAN_FAMILIAR'};
 const clasN = c => {
-  const v = up(c==='FEMENINO'? (S.cfg.CLASIFICAN_FEMENINO||S.cfg.CLASIFICAN_POR_GRUPO) : S.cfg.CLASIFICAN_POR_GRUPO);
+  const key=CLASIFICAN_KEY[c];
+  const raw = (key&&S.cfg[key]!==undefined&&S.cfg[key]!=='') ? S.cfg[key] : S.cfg.CLASIFICAN_POR_GRUPO;
+  const v = up(raw);
   if(v==='TODOS') return equiposDe(c).length||4;
   return num(v)||4;
 };
@@ -574,11 +594,12 @@ const equiposDe = c => S.equipos.filter(e=>e.categoria===c&&e.activo).map(e=>e.e
 const partidosDe = (c,fase) => S.partidos.filter(p=>p.categoria===c&&(fase?p.fase===fase:true));
 
 /* ---------- categoría de los partidos de eliminatoria ----------
-   Un cruce de octavos/cuartos/etc. junta un equipo del GRUPO A con uno del GRUPO B,
-   así que esos partidos pasan a la categoría "HOMBRES" (ni A ni B por separado).     */
-const catPartido = (cat,fase) => (fase&&fase!=='GRUPOS') ? 'HOMBRES' : cat;
+   Un cruce de octavos/cuartos/etc. de HOMBRES junta un equipo del GRUPO A con uno del
+   GRUPO B, así que esos partidos pasan a la categoría "HOMBRES" (ni A ni B por separado).
+   Damas y Familiar son un solo grupo: sus eliminatorias se quedan con su propia categoría. */
+const catPartido = (cat,fase) => (fase&&fase!=='GRUPOS'&&(cat==='GRUPO A'||cat==='GRUPO B')) ? 'HOMBRES' : cat;
 /* equipos elegibles para un partido según su categoría y fase */
-const equiposPara = (cat,fase) => (cat==='HOMBRES'||(fase&&fase!=='GRUPOS'))
+const equiposPara = (cat,fase) => (cat==='HOMBRES'||((fase&&fase!=='GRUPOS')&&(cat==='GRUPO A'||cat==='GRUPO B')))
   ? equiposDe('GRUPO A').concat(equiposDe('GRUPO B')) : equiposDe(cat);
 /* ¿el partido cuenta dentro de esta categoría al filtrar? Un cruce de HOMBRES
    aparece tanto en GRUPO A como en GRUPO B, porque juegan equipos de los dos.   */
@@ -648,28 +669,38 @@ function ordenCruces(n,sembrado){
   const h=ordenLlave(n/2);
   return h.concat(h.map(j=>n-1-j));
 }
-function paresPrimeraRonda(sembrado){
-  const n=Math.min(clasN('GRUPO A'),equiposDe('GRUPO A').length,equiposDe('GRUPO B').length);
-  const A=tabla('GRUPO A'), B=tabla('GRUPO B');
-  return ordenCruces(n,sembrado).map(i=>(A[i]&&B[n-1-i])?[A[i].equipo,B[n-1-i].equipo]:null).filter(Boolean);
+function paresPrimeraRonda(track,sembrado){
+  const t=trackDe(track);
+  if(t.cats.length===2){
+    const [c1,c2]=t.cats;
+    const n=Math.min(clasN(c1),equiposDe(c1).length,equiposDe(c2).length);
+    const A=tabla(c1), B=tabla(c2);
+    return ordenCruces(n,sembrado).map(i=>(A[i]&&B[n-1-i])?[A[i].equipo,B[n-1-i].equipo]:null).filter(Boolean);
+  }
+  const c=t.cats[0];
+  const nf=Math.min(clasN(c),equiposDe(c).length), T=tabla(c), m=Math.floor(nf/2);
+  return ordenCruces(m,sembrado).map(i=>(T[i]&&T[nf-1-i])?[T[i].equipo,T[nf-1-i].equipo]:null).filter(Boolean);
 }
 
-/* Arma la llave completa, mezclando lo que ya existe en el Sheet con lo que falta.
-   Devuelve {rondas:[{fase,slots}], tercero, muerteSubita:true/false}.                */
-function armarLlave(){
-  const n=Math.min(clasN('GRUPO A'),equiposDe('GRUPO A').length,equiposDe('GRUPO B').length);
-  const f0=faseDe(n*2);
+/* Arma la llave completa de una serie (track), mezclando lo que ya existe en el Sheet
+   con lo que falta. Devuelve {rondas:[{fase,slots}], tercero, muerteSubita:true/false}. */
+function armarLlave(track){
+  const t=trackDe(track), esH=t.cats.length===2;
+  const n = esH? Math.min(clasN(t.cats[0]),equiposDe(t.cats[0]).length,equiposDe(t.cats[1]).length)
+               : Math.min(clasN(t.cats[0]),equiposDe(t.cats[0]).length);
+  const f0=faseDe(esH?n*2:n);
   const muerteSubita = RONDAS.indexOf(f0)<0;          /* f0 no es OCTAVOS/CUARTOS/SEMIFINAL/FINAL */
   const fases = muerteSubita ? [f0] : RONDAS.slice(RONDAS.indexOf(f0));
-  const delSheet=fase=>S.partidos.filter(p=>enCat(p,'HOMBRES')&&p.fase===fase);
+  const catElim = esH? 'HOMBRES' : t.cats[0];
+  const delSheet=fase=>S.partidos.filter(p=>enCat(p,catElim)&&p.fase===fase);
   /* fila del borrador que ocupa una posición de la llave (por su slotKey, no por sus
      equipos: así, si después le cambiás el equipo, sigue siendo "esa misma casilla"). */
-  const idxPos=(fase,pos)=>S.borrador.findIndex(p=>p.slotKey==='H|'+fase+'|'+pos);
+  const idxPos=(fase,pos)=>S.borrador.findIndex(p=>p.slotKey===track+'|'+fase+'|'+pos);
 
   const rondas=[];
   const reales=[]; delSheet(f0).sort((a,b)=>idNum(a)-idNum(b)).forEach(p=>{
     if(!reales.some(q=>mismoCruce(q,p.local,p.visita))) reales.push(p); });
-  const prop=paresPrimeraRonda(!muerteSubita);
+  const prop=paresPrimeraRonda(track,!muerteSubita);
   const slots0=prop.map(([pa,pb],i)=>{
     if(reales[i]) return {local:reales[i].local,visita:reales[i].visita,partido:reales[i],iBorrador:-1};
     const bi=idxPos(f0,i);
@@ -721,19 +752,19 @@ function armarLlave(){
   return {rondas,tercero,muerteSubita};
 }
 
-/* Cada fila que manda al borrador queda etiquetada con slotKey = "H|fase|posición":
+/* Cada fila que manda al borrador queda etiquetada con slotKey = "track|fase|posición":
    la posición EN LA LLAVE, no los equipos que tiene en ese momento. Así, si después
    cambiás el equipo, la fila sigue siendo "esa misma casilla" en vez de perderse.   */
-function enviarTanda(fase,items){           /* items: [{pos, local, visita}, …] */
-  const categoria=catPartido('GRUPO A',fase);                 /* siempre HOMBRES */
-  const mismaTanda = p => p.fase===fase && enCat(p,'HOMBRES');
+function enviarTanda(track,fase,items){           /* items: [{pos, local, visita}, …] */
+  const categoria=catPartido(catTrack(track),fase);
+  const mismaTanda = p => p.fase===fase && esDeTrack(p,track);
   const actuales={}; S.borrador.filter(mismaTanda).forEach(p=>{ if(p.slotKey) actuales[p.slotKey]=p; });
   S.borrador = S.borrador.filter(p=>!mismaTanda(p));
   const enSheet = (x,y) => S.partidos.some(p=>mismaTanda(p)&&mismoCruce(p,x,y));
 
   const lista=[]; let nuevos=0;
   items.forEach(({pos,local,visita})=>{
-    const key='H|'+fase+'|'+pos, prev=actuales[key];
+    const key=track+'|'+fase+'|'+pos, prev=actuales[key];
     if(prev&&(has(prev.fecha)||has(prev.hora)||prev.local!==local||prev.visita!==visita)){ lista.push(prev); return; }
     if(enSheet(local,visita)) return;
     lista.push({categoria,fase,jornada:'',fecha:'',hora:'',cancha:'',local,visita,slotKey:key});
@@ -745,17 +776,17 @@ function enviarTanda(fase,items){           /* items: [{pos, local, visita}, …
   return nuevos;
 }
 function enviarCrucePuntual(clave){
-  const [fase,pos,local,visita]=clave.split('||');
-  const key='H|'+fase+'|'+pos;
+  const [track,fase,pos,local,visita]=clave.split('||');
+  const key=track+'|'+fase+'|'+pos;
   if(S.borrador.some(p=>p.slotKey===key)) return;
-  const categoria=catPartido('GRUPO A',fase);
+  const categoria=catPartido(catTrack(track),fase);
   const nid=nextId();
   S.borrador.push({id:nid(1),categoria,fase,jornada:'',fecha:'',hora:'',cancha:'',local,visita,slotKey:key});
   guardarBorrador(); render();
   toast('Cruce agregado al borrador, ya podés elegir otros equipos');
 }
-function mandarRonda(fase){
-  const L=armarLlave();
+function mandarRonda(track,fase){
+  const L=armarLlave(track);
   const fases = (fase==='FINAL'&&L.tercero) ? ['FINAL','TERCER PUESTO'] : [fase];
   let total=0; const hechas=[];
   fases.forEach(f=>{
@@ -764,7 +795,7 @@ function mandarRonda(fase){
     else { const R=L.rondas.find(r=>r.fase===f);
            items=R? R.slots.map(s=>({pos:s.pos,local:s.local,visita:s.visita})).filter(x=>x.local&&x.visita) : []; }
     if(!items.length) return;
-    total+=enviarTanda(f,items); hechas.push(f);
+    total+=enviarTanda(track,f,items); hechas.push(f);
   });
   if(!hechas.length){ toast('Todavía no hay cruces listos para '+fase); return; }
   S.tab='planificar'; render();
@@ -1196,11 +1227,13 @@ function tabGoleadores(){
     '</div></div>'+
     '<div class="grid g3" style="margin-bottom:14px">'+CATS.map(c=>
       '<div class="stat"><div class="n">'+totCat(c)+'</div><div class="l">Goles registrados · '+c+'</div></div>').join('')+'</div>'+
-    /* Hombres y femenino van en tablas separadas: son premios distintos.
+    /* Cada serie va en su propia tabla: son premios distintos.
        Si se filtra una categoría puntual, se muestra solo esa.               */
     (cat
       ? tablaGoleadores(cat,L,cat)
-      : tablaGoleadores('Copa Palermo',L,'HOMBRES'))+
+      : '<div class="grid g3">'+TRACKS.map(t=>
+          tablaGoleadores(t.nombre, L.filter(g=>enTrackCat(g.categoria,t.id)), t.cats.length===2?'HOMBRES':t.cats[0])
+        ).join('')+'</div>')+
     '<div class="card" style="margin-top:14px"><h2>Goles por equipo</h2><div class="tw"><table><thead><tr>'+
       '<th class="pos">#</th><th>Equipo</th>'+(cat?'':'<th>Cat.</th>')+'<th class="n">Goles con goleador</th></tr></thead><tbody>'+
       eqTop.map((e,i)=>'<tr><td class="pos">'+(i+1)+'</td><td class="b">'+esc(corto(e.equipo))+'</td>'+
@@ -1583,7 +1616,7 @@ function tabPlanificar(){
 /* ---------- FASES FINALES ---------- */
 /* Un cruce de la llave: dos equipos (o "Gan. OCT1" mientras no se sabe), el marcador si ya
    se jugó, y una etiqueta de estado (fecha, en borrador, listo para armar, penales…). */
-function tieLlave(s,etq){
+function tieLlave(s,etq,track){
   const p=s.partido, jugado=!!(p&&p.jugado);
   const r=jugado? resultadoDe(p) : null, pen=jugado? penales(p) : null;
   const esp=(i)=> s.origen? (s.perd?'Perd. ':'Gan. ')+s.origen[i].etq : '—';
@@ -1593,7 +1626,7 @@ function tieLlave(s,etq){
   const editable = !p && s.enBorrador;
   const bEntry = editable? S.borrador[s.iBorrador] : null;
   const puedeAdelantar = !p && !editable && s.local && s.visita;
-  const claveAdelantar = puedeAdelantar? [s.fase,s.pos,s.local,s.visita].join('||') : '';
+  const claveAdelantar = puedeAdelantar? [track,s.fase,s.pos,s.local,s.visita].join('||') : '';
 
   const fila=(eq,i,gol,pn,gana)=>{
     if(editable){
@@ -1623,33 +1656,38 @@ function tieLlave(s,etq){
     '</div>';
 }
 
-/* La llave completa de hombres: una columna por ronda, hasta la final (o una sola
+/* La llave completa de una serie: una columna por ronda, hasta la final (o una sola
    columna si todavía no clasifica una cantidad pareja y toca jugar muerte súbita). */
-function cardLlave(){
-  const L=armarLlave();
+function cardLlave(track,titulo){
+  const L=armarLlave(track);
   if(!L.rondas.length) return '';
   const R0=L.rondas[0];
   const col=(R,extra)=>{
     const listos=R.slots.filter(s=>s.listo).length + (R.fase==='FINAL'&&L.tercero&&L.tercero.listo?1:0);
     return '<div class="col"><h4>'+(R.fase==='FINAL'?'FINAL':R.fase)+'</h4>'+
-      (listos? '<button class="btn sm amb noprint" data-ronda="'+R.fase+'">+ Armar '+
+      (listos? '<button class="btn sm amb noprint" data-ronda="'+track+'|'+R.fase+'">+ Armar '+
         (R.fase==='FINAL'&&L.tercero&&L.tercero.listo?'final y 3.º':R.fase.toLowerCase())+' ('+listos+')</button>':'')+
-      R.slots.map(s=>tieLlave(s)).join('')+(extra||'')+'</div>';
+      R.slots.map(s=>tieLlave(s,null,track)).join('')+(extra||'')+'</div>';
   };
-  const terceroHTML = L.tercero? '<h4 style="margin-top:6px">TERCER PUESTO</h4>'+tieLlave(L.tercero,'3.º PUESTO') : '';
+  const terceroHTML = L.tercero? '<h4 style="margin-top:6px">TERCER PUESTO</h4>'+
+    tieLlave(L.tercero,'3.º PUESTO',track) : '';
   const provisional = R0.slots.some(s=>s.proyectado);
-  return '<div class="card" style="margin-bottom:14px"><h2>Llave · Hombres '+
+  const t=trackDe(track), esH=t.cats.length===2;
+  const nClas = esH? Math.min(clasN(t.cats[0]),equiposDe(t.cats[0]).length,equiposDe(t.cats[1]).length)
+                    : Math.min(clasN(t.cats[0]),equiposDe(t.cats[0]).length);
+  return '<div class="card" style="margin-bottom:14px"><h2>Llave · '+esc(titulo)+' '+
     '<span class="sub">'+(provisional?'cruces provisionales con la tabla de hoy':'según los partidos programados')+'</span>'+
-    botonAyuda('apLlave')+'</h2>'+
-    ayuda('apLlave', (L.muerteSubita?
-      'Con <b>'+Math.min(clasN('GRUPO A'),equiposDe('GRUPO A').length,equiposDe('GRUPO B').length)+' por grupo</b> no se arma '+
+    botonAyuda('apLlave'+track)+'</h2>'+
+    ayuda('apLlave'+track, (L.muerteSubita?
+      'Con <b>'+nClas+(esH?' por grupo':'')+'</b> no se arma '+
       'una llave pareja (no es 2, 4, 8 u otra que cuadre), así que esta ronda de <b>muerte súbita</b> queda '+
       'como ronda única: no hay una sola forma correcta de repartir los pases libres a la siguiente fase. '+
       'Cuando termine de jugarse, armá la próxima ronda a mano desde <b>Planificar → 2 · Agregar partido</b>, '+
       'o avisá para agregar el salto automático con la regla que prefieras.'
       : 'Cada ronda sale de los <b>ganadores</b> de la anterior, de a dos partidos seguidos de la llave. '+
-        'Los favoritos quedan en lados opuestos: el 1º de cada grupo solo se puede cruzar con el otro en la '+
-        '<b>final</b>. Si un partido termina empatado hay que anotar los <b>penales</b> (en Planificar → '+
+        (esH? 'Los favoritos quedan en lados opuestos: el 1º de cada grupo solo se puede cruzar con el otro en la <b>final</b>. '
+            : 'Los favoritos quedan en lados opuestos: el 1º solo se puede cruzar con el 2º en la <b>final</b>. ')+
+        'Si un partido termina empatado hay que anotar los <b>penales</b> (en Planificar → '+
         'Partidos programados, o en ✏ Editar), si no, no se sabe quién avanza.')+
       ' Para <b>cambiar quién se cruza con quién</b>: si el cruce ya está en el borrador, tocá cualquiera de '+
       'los dos equipos y elegí otro de la lista; si todavía no está armado, tocá <b>✎ Cambiar equipos</b>.')+
@@ -1658,37 +1696,41 @@ function cardLlave(){
     '</div></div></div>';
 }
 
-/* Resumen de la llave dentro de Planificar: en qué ronda va y qué cruces se pueden armar. */
+/* Resumen de las eliminatorias dentro de Planificar: en qué ronda va cada serie y qué
+   cruces ya se pueden armar. Aparece cuando ya existe algún partido de eliminatoria. */
 function cardEliminatorias(){
-  const hay=S.partidos.some(p=>p.fase!=='GRUPOS')||S.borrador.some(p=>p.fase!=='GRUPOS');
-  if(!hay) return '';
-  const L=armarLlave();
-  const chips=[]; let accion=null;
-  L.rondas.forEach(R=>{
-    const total=R.slots.length;
-    const jugados=R.slots.filter(s=>s.partido&&s.partido.jugado).length;
-    const progr=R.slots.filter(s=>s.partido&&!s.partido.jugado).length;
-    const listos=R.slots.filter(s=>s.listo).length + (R.fase==='FINAL'&&L.tercero&&L.tercero.listo?1:0);
-    const empates=R.slots.filter(s=>s.partido&&s.partido.jugado&&resultadoDe(s.partido)&&resultadoDe(s.partido).empate).length;
-    if(!jugados&&!progr&&!listos&&!R.slots.some(s=>s.enBorrador)) return;
-    chips.push('<span class="tag'+(jugados===total&&total?' v':'')+'">'+R.fase+' '+jugados+'/'+total+' jugados</span>'+
-      (listos?' <span class="tag v">'+listos+' listo'+(listos>1?'s':'')+' para armar</span>':'')+
-      (empates?' <span class="tag r">'+empates+' empate'+(empates>1?'s':'')+' sin penales</span>':''));
-    if(!accion&&listos) accion={fase:R.fase,listos,final:R.fase==='FINAL'&&L.tercero&&L.tercero.listo};
+  const filas=[];
+  TRACKS.forEach(t=>{
+    const track=t.id;
+    const hay=S.partidos.some(p=>p.fase!=='GRUPOS'&&esDeTrack(p,track))||
+              S.borrador.some(p=>p.fase!=='GRUPOS'&&esDeTrack(p,track));
+    if(!hay) return;
+    const L=armarLlave(track);
+    const chips=[]; let accion=null;
+    L.rondas.forEach(R=>{
+      const total=R.slots.length;
+      const jugados=R.slots.filter(s=>s.partido&&s.partido.jugado).length;
+      const progr=R.slots.filter(s=>s.partido&&!s.partido.jugado).length;
+      const listos=R.slots.filter(s=>s.listo).length + (R.fase==='FINAL'&&L.tercero&&L.tercero.listo?1:0);
+      const empates=R.slots.filter(s=>s.partido&&s.partido.jugado&&resultadoDe(s.partido)&&resultadoDe(s.partido).empate).length;
+      if(!jugados&&!progr&&!listos&&!R.slots.some(s=>s.enBorrador)) return;
+      chips.push('<span class="tag'+(jugados===total&&total?' v':'')+'">'+R.fase+' '+jugados+'/'+total+' jugados</span>'+
+        (listos?' <span class="tag v">'+listos+' listo'+(listos>1?'s':'')+' para armar</span>':'')+
+        (empates?' <span class="tag r">'+empates+' empate'+(empates>1?'s':'')+' sin penales</span>':''));
+      if(!accion&&listos) accion={fase:R.fase,listos,final:R.fase==='FINAL'&&L.tercero&&L.tercero.listo};
+    });
+    if(!chips.length) return;
+    filas.push('<div class="pad" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)">'+
+      '<b style="min-width:140px">'+esc(t.nombre)+'</b><div style="flex:1 1 280px">'+chips.join(' &nbsp;·&nbsp; ')+'</div>'+
+      (accion? '<button class="btn sm amb noprint" data-ronda="'+track+'|'+accion.fase+'">+ Armar '+
+        (accion.final?'final y 3.º puesto':accion.fase.toLowerCase())+' ('+accion.listos+')</button>':'')+'</div>');
   });
-  if(!chips.length) return '';
+  if(!filas.length) return '';
   return '<div class="card" style="margin-bottom:14px"><h2>🏆 Fases finales <span class="sub">siguiente ronda según los resultados</span>'+
-    '<button class="btn sm noprint" data-irfases="1" style="margin-left:auto">Ver la llave</button></h2>'+
-    '<div class="pad" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">'+
-    '<div style="flex:1 1 280px">'+chips.join(' &nbsp;·&nbsp; ')+'</div>'+
-    (accion? '<button class="btn sm amb noprint" data-ronda="'+accion.fase+'">+ Armar '+
-      (accion.final?'final y 3.º puesto':accion.fase.toLowerCase())+' ('+accion.listos+')</button>':'')+'</div></div>';
+    '<button class="btn sm noprint" data-irfases="1" style="margin-left:auto">Ver la llave</button></h2>'+filas.join('')+'</div>';
 }
 
 function tabFases(){
-  const A=tabla('GRUPO A'), B=tabla('GRUPO B');
-  const n=Math.min(clasN('GRUPO A'),A.length,B.length);
-  const todos=n>=A.length&&n>=B.length;
   const reales=S.partidos.filter(p=>p.fase!=='GRUPOS');
 
   let h='';
@@ -1699,23 +1741,43 @@ function tabFases(){
       FASES.filter(f=>porFase[f]).map(f=>'<div class="jhead"><h4>'+f+'</h4><span>'+porFase[f].length+' partidos</span></div>'+
         porFase[f].map(p=>filaPartido(p,p.categoria)).join('')).join('')+'</div>';
   }
-  if(!todos) h+='<div class="warn noprint" style="margin-bottom:12px">Ahora están clasificando <b>'+n+'</b> por grupo. '+
-    'Para que clasifiquen <b>todos los equipos</b>, en el Google Sheet abrí la hoja <code>CONFIG</code> y en la fila '+
-    '<code>CLASIFICAN_POR_GRUPO</code> escribí <code>TODOS</code> en la columna VALOR. Después tocá ↻ Actualizar.</div>';
 
-  h+=cardLlave();
-
-  h+='<div class="grid g2">'+[['GRUPO A',A,n],['GRUPO B',B,n]].map(([c,t,k])=>
-    '<div class="card"><h3>Clasificados · '+c+'</h3><div class="tw"><table><tbody>'+
-    t.slice(0,k).map((r,i)=>'<tr class="clasif"><td class="pos">'+(i+1)+'</td><td class="b">'+esc(corto(r.equipo))+'</td>'+
-    '<td class="n"><span class="pts">'+r.pts+'</span></td></tr>').join('')+'</tbody></table></div></div>').join('')+'</div>';
+  TRACKS.forEach(t=>{
+    const esH=t.cats.length===2;
+    if(esH){
+      const [c1,c2]=t.cats, A=tabla(c1), B=tabla(c2);
+      const n=Math.min(clasN(c1),A.length,B.length);
+      const todos=n>=A.length&&n>=B.length;
+      if(!todos) h+='<div class="warn noprint" style="margin-bottom:12px">Ahora están clasificando <b>'+n+'</b> por grupo en '+esc(t.nombre)+'. '+
+        'Para que clasifiquen <b>todos los equipos</b>, en el Google Sheet abrí la hoja <code>CONFIG</code> y en la fila '+
+        '<code>CLASIFICAN_POR_GRUPO</code> escribí <code>TODOS</code> en la columna VALOR. Después tocá ↻ Actualizar.</div>';
+      h+=cardLlave(t.id,t.nombre);
+      h+='<div class="grid g2">'+[[c1,A,n],[c2,B,n]].map(([c,tb,k])=>
+        '<div class="card"><h3>Clasificados · '+c+'</h3><div class="tw"><table><tbody>'+
+        tb.slice(0,k).map((r,i)=>'<tr class="clasif"><td class="pos">'+(i+1)+'</td><td class="b">'+esc(corto(r.equipo))+'</td>'+
+        '<td class="n"><span class="pts">'+r.pts+'</span></td></tr>').join('')+'</tbody></table></div></div>').join('')+'</div>';
+    } else {
+      const c=t.cats[0], T=tabla(c), n=Math.min(clasN(c),T.length);
+      const todos=n>=T.length;
+      if(!todos) h+='<div class="warn noprint" style="margin-bottom:12px">Ahora están clasificando <b>'+n+'</b> en '+esc(t.nombre)+'. '+
+        'Para que clasifiquen <b>todos los equipos</b>, en el Google Sheet abrí la hoja <code>CONFIG</code> y escribí '+
+        '<code>TODOS</code> en <code>'+(CLASIFICAN_KEY[c]||'CLASIFICAN_POR_GRUPO')+'</code> (agregala si no existe). Después tocá ↻ Actualizar.</div>';
+      h+=cardLlave(t.id,t.nombre);
+      h+='<div class="card"><h3>Clasificados · '+esc(t.nombre)+'</h3><div class="tw"><table><tbody>'+
+        T.slice(0,n).map((r,i)=>'<tr class="clasif"><td class="pos">'+(i+1)+'</td><td class="b">'+esc(corto(r.equipo))+'</td>'+
+        '<td class="n"><span class="pts">'+r.pts+'</span></td></tr>').join('')+'</tbody></table></div></div>';
+    }
+  });
   return h;
 }
 
 /* ---------- PAGOS ---------- */
-const valorInscripcion = cat => num(cat==='FEMENINO'
-  ? (S.cfg.VALOR_INSCRIPCION_FEMENINO!==undefined?S.cfg.VALOR_INSCRIPCION_FEMENINO:S.cfg.VALOR_INSCRIPCION)
-  : (S.cfg.VALOR_INSCRIPCION_HOMBRES!==undefined?S.cfg.VALOR_INSCRIPCION_HOMBRES:S.cfg.VALOR_INSCRIPCION));
+const VALOR_INSC_KEY = {'GRUPO A':'VALOR_INSCRIPCION_HOMBRES','GRUPO B':'VALOR_INSCRIPCION_HOMBRES',
+  'DAMAS NIVEL MEDIO':'VALOR_INSCRIPCION_DAMAS','FAMILIAR VARONES':'VALOR_INSCRIPCION_FAMILIAR'};
+const valorInscripcion = cat => {
+  const key=VALOR_INSC_KEY[cat];
+  return num(key&&S.cfg[key]!==undefined&&S.cfg[key]!==''?S.cfg[key]:S.cfg.VALOR_INSCRIPCION);
+};
 
 /* ---------- registrar un pago ---------- */
 const CONCEPTOS=['INSCRIPCION','ARBITRAJE','ARBITRAJE ADEUDADO','MULTA','OTRO'];
@@ -1973,7 +2035,7 @@ function enlazar(){
   const cp=$('#btnCopy'); if(cp) cp.onclick=()=>{ copiar(borradorTSV()); };
   const cs=$('#btnCsv'); if(cs) cs.onclick=descargarCSV;
   const cl=$('#btnClear'); if(cl) cl.onclick=async()=>{ if(await confirmar('¿Vaciar el borrador?')){ S.borrador=[]; guardarBorrador(); render(); } };
-  document.querySelectorAll('[data-ronda]').forEach(b=>b.onclick=()=>mandarRonda(b.dataset.ronda));
+  document.querySelectorAll('[data-ronda]').forEach(b=>b.onclick=()=>{ const [t,f]=b.dataset.ronda.split('|'); mandarRonda(t,f); });
   document.querySelectorAll('[data-irfases]').forEach(b=>b.onclick=()=>{ S.tab='fases'; render(); window.scrollTo({top:0,behavior:'smooth'}); });
   document.querySelectorAll('[data-cruceunico]').forEach(b=>b.onclick=()=>enviarCrucePuntual(b.dataset.cruceunico));
 
@@ -2876,8 +2938,7 @@ function descargarImagen(){
 
 /* ---------- imagen de la tabla de goleadores ---------- */
 function imagenGoleadores(clave){
-  const L = clave==='HOMBRES' ? goleadores(null).filter(g=>g.categoria!=='FEMENINO')
-          : clave==='FEMENINO' ? goleadores('FEMENINO')
+  const L = clave==='HOMBRES' ? goleadores(null).filter(g=>enTrackCat(g.categoria,'H'))
           : goleadores(clave);
   if(!L.length){ toast('No hay goleadores para exportar'); return; }
   const top=L.slice(0,8), P=40, HF=62;
