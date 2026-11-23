@@ -584,7 +584,8 @@ const PE = ()=>num(S.cfg.PTS_EMPATE)||1;
 /* cuántos clasifican por grupo: un número, o la palabra TODOS (clasifican todos los equipos del grupo).
    Cada categoría puede tener su propio tope (CLASIFICAN_DAMAS, CLASIFICAN_FAMILIAR); si no está puesto
    en el Sheet, usa el mismo CLASIFICAN_POR_GRUPO de Hombres.                                           */
-const CLASIFICAN_KEY = {'DAMAS NIVEL MEDIO':'CLASIFICAN_DAMAS','FAMILIAR VARONES':'CLASIFICAN_FAMILIAR'};
+const CLASIFICAN_KEY = {'GRUPO A':'CLASIFICAN_HOMBRES','GRUPO B':'CLASIFICAN_HOMBRES',
+  'DAMAS NIVEL MEDIO':'CLASIFICAN_DAMAS','FAMILIAR VARONES':'CLASIFICAN_FAMILIAR'};
 /* Si una serie tiene un formato a medida (bye, mejores perdedoras, etc. que la llave
    automática no sabe armar), poniendo SI en esta fila de CONFIG se apaga la propuesta
    automática de esa serie: los cruces se arman a mano y se ven en "Fases finales en
@@ -676,12 +677,29 @@ function ordenCruces(n,sembrado){
   const h=ordenLlave(n/2);
   return h.concat(h.map(j=>n-1-j));
 }
+/* potencia de 2 más chica que sea >= x (16 para 13..16, 8 para 5..8, etc.) */
+function pow2Arriba(x){ let p=1; while(p<x) p*=2; return p; }
 function paresPrimeraRonda(track,sembrado){
   const t=trackDe(track);
   if(t.cats.length===2){
     const [c1,c2]=t.cats;
     const n=Math.min(clasN(c1),equiposDe(c1).length,equiposDe(c2).length);
     const A=tabla(c1), B=tabla(c2);
+    const total=n*2, byeTot=pow2Arriba(total)-total;
+    if(byeTot>0){
+      /* con un número impar de clasificados por grupo el cruce A-B no da una llave pareja:
+         el/los mejor(es) sembrado(s) de CADA grupo (mismo número de los dos lados, para no
+         favorecer a ninguno) pasan directo, y el resto se cruza como siempre (un equipo de
+         A contra uno de B, nunca dos del mismo grupo).                                     */
+      const byeEach=byeTot/2, nr=n-byeEach;
+      const seedOrder=[];
+      for(let k=0;k<byeEach;k++) if(A[k]) seedOrder.push([A[k].equipo,null]);
+      for(let k=0;k<byeEach;k++) if(B[k]) seedOrder.push([B[k].equipo,null]);
+      for(let i=0;i<nr;i++){ const a=A[byeEach+i], b=B[byeEach+nr-1-i]; if(a&&b) seedOrder.push([a.equipo,b.equipo]); }
+      const m=seedOrder.length;
+      const orden=(sembrado&&m>=1&&!(m&(m-1)))? ordenLlave(m) : Array.from({length:m},(_,i)=>i);
+      return orden.map(i=>seedOrder[i]);
+    }
     return ordenCruces(n,sembrado).map(i=>(A[i]&&B[n-1-i])?[A[i].equipo,B[n-1-i].equipo]:null).filter(Boolean);
   }
   const c=t.cats[0];
@@ -710,7 +728,7 @@ function armarLlave(track){
   const t=trackDe(track), esH=t.cats.length===2, bye=t.bye||0;
   const n = esH? Math.min(clasN(t.cats[0]),equiposDe(t.cats[0]).length,equiposDe(t.cats[1]).length)
                : Math.min(clasN(t.cats[0]),equiposDe(t.cats[0]).length);
-  const f0=faseDe(esH?n*2:(n+bye));
+  const f0=faseDe(esH?pow2Arriba(n*2):(n+bye));
   const muerteSubita = RONDAS.indexOf(f0)<0;          /* f0 no es OCTAVOS/CUARTOS/SEMIFINAL/FINAL */
   const fases = muerteSubita ? [f0] : RONDAS.slice(RONDAS.indexOf(f0));
   const catElim = esH? 'HOMBRES' : t.cats[0];
@@ -1795,7 +1813,8 @@ function tabFases(){
       const todos=n>=A.length&&n>=B.length;
       if(!todos) h+='<div class="warn noprint" style="margin-bottom:12px">Ahora están clasificando <b>'+n+'</b> por grupo en '+esc(t.nombre)+'. '+
         'Para que clasifiquen <b>todos los equipos</b>, en el Google Sheet abrí la hoja <code>CONFIG</code> y en la fila '+
-        '<code>CLASIFICAN_POR_GRUPO</code> escribí <code>TODOS</code> en la columna VALOR. Después tocá ↻ Actualizar.</div>';
+        '<code>'+(CLASIFICAN_KEY[c1]||'CLASIFICAN_POR_GRUPO')+'</code> escribí <code>TODOS</code> en la columna VALOR '+
+        '(agregala si no existe). Después tocá ↻ Actualizar.</div>';
       h+=cardLlave(t.id,t.nombre);
       h+='<div class="grid g2">'+[[c1,A,n],[c2,B,n]].map(([c,tb,k])=>
         '<div class="card"><h3>Clasificados · '+c+'</h3><div class="tw"><table><tbody>'+
