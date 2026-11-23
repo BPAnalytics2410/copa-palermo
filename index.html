@@ -583,6 +583,11 @@ const PE = ()=>num(S.cfg.PTS_EMPATE)||1;
    Cada categoría puede tener su propio tope (CLASIFICAN_DAMAS, CLASIFICAN_FAMILIAR); si no está puesto
    en el Sheet, usa el mismo CLASIFICAN_POR_GRUPO de Hombres.                                           */
 const CLASIFICAN_KEY = {'DAMAS NIVEL MEDIO':'CLASIFICAN_DAMAS','FAMILIAR VARONES':'CLASIFICAN_FAMILIAR'};
+/* Si una serie tiene un formato a medida (bye, mejores perdedoras, etc. que la llave
+   automática no sabe armar), poniendo SI en esta fila de CONFIG se apaga la propuesta
+   automática de esa serie: los cruces se arman a mano y se ven en "Fases finales en
+   juego", no en la tarjeta "Llave" (que mostraría algo que no es lo que se jugó).      */
+const LLAVE_MANUAL_KEY = {'DAMAS NIVEL MEDIO':'LLAVE_MANUAL_DAMAS','FAMILIAR VARONES':'LLAVE_MANUAL_FAMILIAR'};
 const clasN = c => {
   const key=CLASIFICAN_KEY[c];
   const raw = (key&&S.cfg[key]!==undefined&&S.cfg[key]!=='') ? S.cfg[key] : S.cfg.CLASIFICAN_POR_GRUPO;
@@ -1661,6 +1666,18 @@ function tieLlave(s,etq,track){
 /* La llave completa de una serie: una columna por ronda, hasta la final (o una sola
    columna si todavía no clasifica una cantidad pareja y toca jugar muerte súbita). */
 function cardLlave(track,titulo){
+  const t0=trackDe(track);
+  const manualKey = t0.cats.length===1 ? LLAVE_MANUAL_KEY[t0.cats[0]] : null;
+  if(manualKey && up(S.cfg[manualKey]||'')==='SI'){
+    return '<div class="card" style="margin-bottom:14px"><h2>Llave · '+esc(titulo)+
+      ' <span class="sub">se arma a mano</span>'+botonAyuda('apLlave'+track)+'</h2>'+
+      ayuda('apLlave'+track,'Esta serie tiene un formato a medida (con bye, mejores perdedoras u otra regla '+
+        'que no es una llave pareja), así que acá no se arma sola. Los cruces se cargan a mano desde '+
+        '<b>Planificar → 2 · Agregar partido</b>, y se ven en <b>"Fases finales en juego"</b> arriba de todo, '+
+        'agrupados por fase. Para volver a activar esta tarjeta automática, en el Google Sheet borrá o poné '+
+        '<code>NO</code> en <code>'+manualKey+'</code> (hoja <code>CONFIG</code>).')+
+      '</div>';
+  }
   const L=armarLlave(track);
   if(!L.rondas.length) return '';
   const R0=L.rondas[0];
@@ -1704,6 +1721,8 @@ function cardEliminatorias(){
   const filas=[];
   TRACKS.forEach(t=>{
     const track=t.id;
+    const manualKey = t.cats.length===1 ? LLAVE_MANUAL_KEY[t.cats[0]] : null;
+    if(manualKey && up(S.cfg[manualKey]||'')==='SI') return;
     const hay=S.partidos.some(p=>p.fase!=='GRUPOS'&&esDeTrack(p,track))||
               S.borrador.some(p=>p.fase!=='GRUPOS'&&esDeTrack(p,track));
     if(!hay) return;
